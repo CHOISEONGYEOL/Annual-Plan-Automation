@@ -1,0 +1,44 @@
+.teacher-timetable-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .teacher-timetable-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: #333;
+  }
+  
+  .teacher-timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13px;
+    background: #fff;
+  }
+  
+  .teacher-timetable-table thead {
+    background: #f8f9fa;
+  }
+  
+  .teacher-timetable-table th,
+  .teacher-timetable-table td {
+    border: 1px solid #dee2e6;
+    padding: 6px 8px;
+    text-align: center;
+    vertical-align: middle;
+    word-break: break-word;
+    white-space: pre-line; /* 줄바꿈 표시용 */
+  }
+  
+  .teacher-timetable-table th:first-child,
+  .teacher-timetable-table td:first-child {
+    width: 60px;
+    min-width: 60px;
+  }
+  
+  .teacher-timetable-table tbody tr:nth-child(even) {
+    background: #fcfcfc;
+  }
+  

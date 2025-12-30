@@ -1,0 +1,121 @@
+.year-semester-selection {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.btn-back {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 16px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: #5a6268;
+}
+
+.year-semester-selection h2 {
+  margin-bottom: 30px;
+  color: #333;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  color: #666;
+  font-weight: 500;
+}
+
+.form-group input[type="number"],
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+}
+
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.year-select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+}
+
+.year-select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.semester-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.semester-buttons button {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.semester-buttons button:hover {
+  border-color: #007bff;
+  background: #f8f9fa;
+}
+
+.semester-buttons button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.btn-confirm {
+  width: 100%;
+  padding: 15px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+
+.btn-confirm:hover {
+  background: #0056b3;
+}
+

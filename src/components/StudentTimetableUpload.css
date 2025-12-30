@@ -1,0 +1,209 @@
+/* 루트 컨테이너 */
+.student-timetable-upload {
+    padding: 20px 24px;
+    max-width: 720px;
+    margin: 0 auto;
+    background: #f5f7fb;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    box-sizing: border-box;
+  }
+  
+  /* 제목 */
+  .student-timetable-upload h2,
+  .student-timetable-upload .student-timetable-title {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  /* 학교 / 학기 정보 라인 (첫 번째 p) */
+  .student-timetable-upload > p:nth-of-type(1),
+  .student-timetable-upload .student-timetable-meta {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: #374151;
+  }
+  
+  .student-timetable-upload > p:nth-of-type(1) strong,
+  .student-timetable-upload .student-timetable-meta strong {
+    font-weight: 600;
+  }
+  
+  /* 설명 문구 (두 번째 p) */
+  .student-timetable-upload > p:nth-of-type(2),
+  .student-timetable-upload .student-timetable-description {
+    margin: 0 0 16px 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #6b7280;
+  }
+  
+  /* =========================
+     파일 업로드 카드
+     - 현재 구조: student-timetable-upload > div (첫 번째 div)
+     ========================= */
+  
+  .student-timetable-upload > div:first-of-type,
+  .student-timetable-upload .student-timetable-file-card {
+    padding: 16px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    margin-bottom: 16px;
+  }
+  
+  /* 파일 인풋 감싸는 div */
+  .student-timetable-upload > div:first-of-type > div,
+  .student-timetable-upload .student-timetable-file-input-row {
+    margin-bottom: 10px;
+  }
+  
+  /* 파일 인풋 */
+  .student-timetable-upload input[type='file'],
+  .student-timetable-upload .student-timetable-file-input {
+    font-size: 13px;
+  }
+  
+  /* 파일 안내 문구 */
+  .student-timetable-upload > div:first-of-type p,
+  .student-timetable-upload .student-timetable-file-help {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  .student-timetable-upload code,
+  .student-timetable-upload .student-timetable-file-help code {
+    font-family: 'SFMono-Regular', ui-monospace, Menlo, Monaco, Consolas,
+      'Liberation Mono', 'Courier New', monospace;
+    font-size: 11px;
+    background: #eef2ff;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #1f2937;
+  }
+  
+  /* =========================
+     버튼 영역
+     - 현재 구조: student-timetable-upload > div:nth-of-type(2)
+     ========================= */
+  
+  .student-timetable-upload > div:nth-of-type(2),
+  .student-timetable-upload .student-timetable-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  /* 공통 버튼 스타일 */
+  .student-timetable-upload button,
+  .student-timetable-upload .student-btn {
+    font-size: 13px;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s,
+      box-shadow 0.15s ease, transform 0.05s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  /* ← 달력으로 돌아가기 버튼 (첫 번째 버튼) */
+  .student-timetable-upload > div:nth-of-type(2) button:first-of-type,
+  .student-timetable-upload .student-btn-back {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+  }
+  
+  .student-timetable-upload > div:nth-of-type(2) button:first-of-type:hover,
+  .student-timetable-upload .student-btn-back:hover {
+    background: #f3f4f6;
+  }
+  
+  /* 학생 시간표 업로드 버튼 (두 번째 버튼) */
+  .student-timetable-upload > div:nth-of-type(2) button:last-of-type,
+  .student-timetable-upload .student-btn-upload {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 500;
+    padding: 8px 18px;
+  }
+  
+  .student-timetable-upload > div:nth-of-type(2) button:last-of-type:hover:not(:disabled),
+  .student-timetable-upload .student-btn-upload:hover:not(:disabled) {
+    background: #1d4ed8;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    transform: translateY(1px);
+  }
+  
+  .student-timetable-upload > div:nth-of-type(2) button:last-of-type:disabled,
+  .student-timetable-upload .student-btn-upload:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  
+  /* =========================
+     상태 메시지 박스
+     - JSX: status !== 'idle' 일 때 마지막 div
+     - 추천: 해당 div에 className="student-timetable-status student-status-{status}"
+     ========================= */
+  
+  .student-timetable-upload .student-timetable-status {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  
+  /* 기본(파싱/저장 중) 스타일 */
+  .student-timetable-upload .student-status-parsing,
+  .student-timetable-upload .student-status-saving {
+    background: #eef3ff;
+    color: #1a3b7c;
+  }
+  
+  /* 완료 */
+  .student-timetable-upload .student-status-done {
+    background: #e6f4ea;
+    color: #137333;
+  }
+  
+  /* 에러 */
+  .student-timetable-upload .student-status-error {
+    background: #fdecea;
+    color: #b3261e;
+  }
+  
+  .student-timetable-upload .student-timetable-status strong {
+    margin-right: 4px;
+  }
+  
+  /* =========================
+     반응형
+     ========================= */
+  
+  @media (max-width: 600px) {
+    .student-timetable-upload {
+      padding: 16px;
+    }
+  
+    .student-timetable-upload > div:nth-of-type(2),
+    .student-timetable-upload .student-timetable-actions {
+      flex-direction: column;
+    }
+  
+    .student-timetable-upload button,
+    .student-timetable-upload .student-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  

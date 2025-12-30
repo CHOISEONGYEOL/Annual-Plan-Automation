@@ -1,0 +1,328 @@
+/* 모달 배경 */
+.lesson-plan-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+/* 모달 카드 */
+.lesson-plan-editor {
+  width: min(900px, 95vw);
+  max-height: 85vh;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 16px;
+  box-sizing: border-box;
+}
+
+/* 헤더 */
+.lesson-plan-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.lesson-plan-editor-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.lesson-plan-editor-header h3 small {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 닫기 버튼 */
+.lesson-plan-editor .btn-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 6px;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s, transform 0.05s;
+}
+
+.lesson-plan-editor .btn-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* 상단 메타 정보 */
+.lesson-plan-editor-meta {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 10px;
+}
+
+.lesson-plan-editor-meta strong {
+  color: #111827;
+}
+
+/* 에러 메시지 */
+.lesson-plan-editor-error {
+  margin: 4px 0 10px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* 탭 영역 */
+.lesson-plan-editor-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 10px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 4px;
+}
+
+.lesson-plan-editor-tabs .tab-button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 13px;
+  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, color 0.15s, transform 0.05s, box-shadow 0.15s;
+}
+
+.lesson-plan-editor-tabs .tab-button:hover {
+  background: #e5e7eb;
+}
+
+.lesson-plan-editor-tabs .tab-button.active {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+}
+
+/* 본문 스크롤 영역 */
+.lesson-plan-editor-body {
+  flex: 1;
+  overflow: auto;
+  margin-top: 6px;
+}
+
+/* 템플릿 테이블 */
+.lesson-plan-editor-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+  background: #ffffff;
+}
+
+.lesson-plan-editor-table thead {
+  background: #f9fafb;
+}
+
+.lesson-plan-editor-table th,
+.lesson-plan-editor-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lesson-plan-editor-table th {
+  font-weight: 600;
+  color: #374151;
+}
+
+.lesson-plan-editor-table td:first-child {
+  width: 70px;
+  text-align: center;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* 텍스트에어리어 */
+.lesson-plan-editor-table textarea {
+  width: 100%;
+  min-height: 40px;
+  resize: vertical;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.lesson-plan-editor-table textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1);
+}
+
+/* 최소 회차 이후 회차 입력 영역 */
+.lesson-plan-editor-extra {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.lesson-plan-editor-extra label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-plan-editor-extra input[type='text'] {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+}
+
+.lesson-plan-editor-extra input[type='text']:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.12);
+}
+
+/* 푸터 버튼 영역 */
+.lesson-plan-editor-footer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 버튼 공통 스타일 */
+.lesson-plan-editor .btn-primary,
+.lesson-plan-editor .btn-secondary {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+
+.lesson-plan-editor .btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.lesson-plan-editor .btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
+.lesson-plan-editor .btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.lesson-plan-editor .btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.lesson-plan-editor .btn-primary:disabled,
+.lesson-plan-editor .btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .lesson-plan-editor {
+    width: 95vw;
+    max-height: 90vh;
+    padding: 14px 14px 12px;
+  }
+
+  .lesson-plan-editor-header h3 {
+    font-size: 16px;
+  }
+
+  .lesson-plan-editor-header h3 small {
+    display: block;
+    margin-top: 2px;
+  }
+
+  .lesson-plan-editor-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .lesson-plan-editor .btn-primary,
+  .lesson-plan-editor .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================
+   공통 수업 계획 템플릿 탭(1차/2차)
+   ============================ */
+
+   .lesson-plan-editor-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 12px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 4px;
+  }
+  
+  /* 기본 탭 버튼 스타일 */
+  .lesson-plan-editor-tab-button {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4b5563;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition:
+      background 0.15s,
+      color 0.15s,
+      transform 0.05s,
+      box-shadow 0.15s;
+    white-space: nowrap;
+  }
+  
+  .lesson-plan-editor-tab-button:hover {
+    background: #e5e7eb;
+  }
+  
+  /* 활성 탭 버튼 스타일 */
+  .lesson-plan-editor-tab-button.active {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+  }
+  
+  .lesson-plan-editor-tab-button.active:hover {
+    background: #1d4ed8;
+  }
+  

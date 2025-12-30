@@ -1,0 +1,512 @@
+.teacher-schedule-upload {
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+/* 상단 헤더 */
+
+.upload-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  margin-right: 20px;
+}
+
+.btn-back:hover {
+  background: #5a6268;
+}
+
+.header-info {
+  flex: 1;
+}
+
+.header-info h2 {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 레이아웃 */
+
+.upload-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* 왼쪽: 파일 업로드 카드 */
+
+.upload-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upload-section h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.description {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.file-guide {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.guide-title {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.guide-text {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.guide-path {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.guide-path p {
+  margin: 0;
+  color: #495057;
+  font-size: 13px;
+  line-height: 1.6;
+  font-family: 'Courier New', monospace;
+}
+
+.guide-path strong {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.file-upload-area {
+  margin-bottom: 20px;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 3px dashed #dee2e6;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8f9fa;
+}
+
+.file-upload-label:hover {
+  border-color: #007bff;
+  background: #e7f3ff;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.upload-text {
+  color: #666;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.upload-button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.file-upload-label:hover .upload-button {
+  background: #0056b3;
+}
+
+.file-info {
+  padding: 15px;
+  background: #e7f3ff;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.file-info p {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-upload {
+  padding: 15px 40px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-upload:hover:not(:disabled) {
+  background: #218838;
+}
+
+.btn-upload:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.btn-process {
+  padding: 15px 40px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-process:hover:not(:disabled) {
+  background: #0069d9;
+}
+
+.btn-process:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 오른쪽: 수업 일정 / 교사 시간표 카드 */
+
+.selection-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.selection-section h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.selection-form {
+  margin-top: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #666;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.btn-generate {
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-generate:hover {
+  background: #218838;
+}
+
+/* 세션 테이블 섹션 */
+
+.sessions-section {
+  margin-top: 30px;
+}
+
+.sessions-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+/* 전체 저장 버튼 – 다른 버튼들과 톤 맞춤 */
+
+.btn-save-all {
+  padding: 10px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.05s ease;
+}
+
+.btn-save-all:hover {
+  background: #0056b3;
+}
+
+.btn-save-all:active {
+  transform: translateY(1px);
+}
+
+/* 교사 검색 인풋 + 추천 리스트 */
+
+.teacher-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.teacher-suggestions {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  position: relative;
+}
+
+.teacher-suggestions li {
+  margin: 0;
+  padding: 0;
+}
+
+.teacher-suggestion-item {
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+}
+
+.teacher-suggestion-item:hover {
+  background: #f1f5f9;
+}
+
+.teacher-suggestion-item.highlighted {
+  background: #e9f5ff;
+}
+
+/* 🔀 기능 분기 토글 버튼 */
+
+.mode-toggle-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode-toggle-button {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  font-size: 13px;
+  cursor: pointer;
+  color: #495057;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.05s;
+  white-space: nowrap;
+}
+
+.mode-toggle-button:hover {
+  background: #e9ecef;
+}
+
+.mode-toggle-button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.mode-toggle-button.active:hover {
+  background: #0063d1;
+}
+
+/* 🔎 교사 시간표 테이블 */
+
+.teacher-timetable-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.teacher-timetable-section h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.teacher-timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+  background: #fff;
+}
+
+.teacher-timetable-table thead {
+  background: #f8f9fa;
+}
+
+.teacher-timetable-table th,
+.teacher-timetable-table td {
+  border: 1px solid #dee2e6;
+  padding: 6px 8px;
+  text-align: center;
+  vertical-align: middle;
+  word-break: break-word;
+  white-space: pre-line; /* 줄바꿈 표시용 */
+}
+
+.teacher-timetable-table th:first-child,
+.teacher-timetable-table td:first-child {
+  width: 60px;
+  min-width: 60px;
+}
+
+.teacher-timetable-table tbody tr:nth-child(even) {
+  background: #fcfcfc;
+}
+
+/* 반응형 */
+
+@media (max-width: 768px) {
+  .upload-container {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .sessions-actions {
+    justify-content: center;
+  }
+}
+
+/* 공통 수업 계획 템플릿 편집 버튼 */
+
+.btn-plan-template {
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s,
+    transform 0.05s ease;
+}
+
+.btn-plan-template::before {
+  content: '📝';
+  font-size: 14px;
+}
+
+.btn-plan-template:hover {
+  background: #007bff;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.btn-plan-template:active {
+  transform: translateY(1px);
+}

@@ -1,0 +1,208 @@
+.school-selection {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.school-selection h2 {
+  margin-bottom: 30px;
+  color: #333;
+  text-align: center;
+}
+
+.school-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.school-name-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.school-name-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.school-confirm-box {
+  padding: 20px;
+  background: #e7f3ff;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.confirm-message {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 16px;
+}
+
+.confirm-message strong {
+  color: #007bff;
+}
+
+.confirm-question {
+  margin-bottom: 15px;
+  color: #666;
+  font-size: 14px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-confirm {
+  flex: 1;
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-confirm:hover {
+  background: #0056b3;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #5a6268;
+}
+
+.school-create-section {
+  text-align: center;
+}
+
+.btn-create {
+  width: 100%;
+  padding: 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-create:hover {
+  background: #218838;
+}
+
+/* 🔹 여기부터 새로 추가: 학교 추천 리스트 스타일 */
+
+.school-suggestions {
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: #fff;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.school-suggestions li + li {
+  border-top: 1px solid #f1f3f5;
+}
+
+.suggestion-item {
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.suggestion-item--active {
+  background-color: #eef; /* 강조 색 (원하는 색으로 변경 가능) */
+}
+
+.suggestion-item:hover {
+  background: #f8f9fa;
+}
+
+.suggestion-item:focus {
+  outline: none;
+  background: #e9f5ff;
+}
+
+/* 🔹 여기까지 새로 추가: 학교 추천 리스트 스타일 */
+/* 🔹 새 학교 안내 영역 (추천 리스트 맨 아래 표시되는 카드) */
+
+.suggestion-new-school {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 12px 14px;
+  background: #f8fafc;           /* 살짝 다른 톤의 배경 */
+  border-top: 1px solid #e2e8f0;  /* 위쪽 경계선으로 일반 항목과 구분 */
+}
+
+.suggestion-new-message {
+  flex: 1;
+  font-size: 13px;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.suggestion-new-message strong {
+  color: #212529;
+}
+
+/* 인라인 "새 학교로 등록하기" 버튼 */
+.btn-create-inline {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #0d6efd;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn-create-inline:hover {
+  background: #0b5ed7;
+  border-color: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+.btn-create-inline:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,1070 @@
+주요 파일을 확인해 최신 상태를 반영 중입니다.
+
+
+[5 tools called]
+
+
+추가 파일 확인 중입니다.
+
+
+[3 tools called]
+
+
+최신 상태를 반영해 문서를 업데이트 중입니다.
+
+```markdown:Anuual Plan Automation 파일별 기능정리.txt
+# 📁 프로젝트 파일 구조 및 역할 정리 (최신 업데이트)
+
+## 📂 루트 디렉토리
+
+### `package.json`
+- 프로젝트 메타데이터 및 의존성 관리
+- 주요 의존성:
+  - `react`, `react-dom`: React 프레임워크
+  - `@supabase/supabase-js`: Supabase 클라이언트 (v2.87.0)
+  - `date-fns`: 날짜 처리 라이브러리
+  - `xlsx`: Excel 파일 파싱
+- 스크립트: `dev`, `build`, `preview`
+
+### `tsconfig.json`
+- TypeScript 컴파일러 설정
+- 타입 체크 및 빌드 옵션
+
+### `vite.config.ts`
+- Vite 빌드 도구 설정
+- React 플러그인 설정
+
+### `index.html`
+- HTML 진입점
+- React 앱이 마운트되는 `#root` 요소 포함
+
+### `.env` (환경 변수 파일)
+- `VITE_SUPABASE_URL`: Supabase 프로젝트 URL
+- `VITE_SUPABASE_ANON_KEY`: Supabase 익명 키
+
+### `PROJECT_RULES.md`
+- 프로젝트 아키텍처 원칙 정의
+- Domain / Infra / UI 3계층 구조 규칙
+- 도메인 레이어 금지사항 및 목표 명시
+
+---
+
+## 📂 `src/` 디렉토리
+
+### `main.tsx`
+- React 앱 진입점
+- `App` 컴포넌트를 DOM에 렌더링
+
+### `App.tsx`
+- 메인 앱 컴포넌트
+- 단계별 라우팅 관리:
+  - `school` → `year-semester` → `calendar` → `teacher-schedule` / `student-timetable`
+- 전역 상태 관리:
+  - 선택된 학교 (`selectedSchool`)
+  - 학년도 (`year`)
+  - 학기 (`semester`)
+- 각 단계별 컴포넌트 렌더링 및 뒤로가기 처리
+- **학생 시간표 입력 단계 추가** (`student-timetable`)
+
+### `App.css`
+- 앱 전체 스타일
+
+### `index.css`
+- 전역 CSS 리셋 및 기본 스타일
+
+### `types.ts`
+- TypeScript 타입 정의
+- 주요 인터페이스:
+  - `School`: 학교 정보 (`id`, `name`)
+  - `AcademicCalendar`: 학사일정 (학교, 연도, 학기, 이벤트 목록)
+  - `SavedCalendar`: 저장된 학사일정 (`savedAt` 타임스탬프 포함)
+  - `CalendarEvent`: 달력 이벤트
+    - 타입: `holiday`, `midterm`, `final`, `recess`, `custom`, `direct`, `substitute`, `opening`, `closing`, `mocktest`
+    - 속성: `id`, `date`, `type`, `name`, `grades` (적용 학년 배열)
+  - `ClassSchedule`: 교사 시간표 (Excel 파싱 데이터)
+    - 속성: `id`, `teacherId`, `teacherName`, `subject`, `grade`, `classNumber`, `dayOfWeek`, `period`
+    - Supabase 메타데이터: `schoolId?`, `year?`, `semester?`
+  - `ClassSession`: 수업 회차 정보 (생성된 수업 일정)
+    - 속성: `sessionNumber`, `date`, `dayOfWeek`, `period`, `classInfo`, `academicEvent`, `content`, `isBeforeFirstTest`
+    - **`segment`**: 시험 구간 구분 (`ExamSegment` 타입, 옵션)
+      - `'before_first'`: 1차 지필 전
+      - `'between_first_second'`: 1차~2차 지필 사이
+      - `'after_second'`: 2차 지필 이후
+    - Supabase 메타데이터: `id?`, `schoolId?`, `year?`, `semester?`, `teacherId?`, `teacherName?`, `grade?`, `classNumber?`, `subject?`
+  - `ParsedSchedule`: 파싱된 시간표 전체 구조
+  - `ExamSegment`: 시험 구간 타입 (`'before_first' | 'between_first_second' | 'after_second'`)
+  - `LessonPlanTemplate`: 수업 계획 템플릿 타입
+    - 속성: `id?`, `schoolId`, `year`, `semester`, `teacherId`, `grade`, `subject`, `segment`, `sessionIndex`, `content`
+  - **`StudentBaseTimetableRow`**: 학생 시간표 행 데이터 타입
+    - 속성: `schoolId`, `year`, `semester`, `grade`, `classNumber`, `studentNumber`, `studentName`, `dayOfWeek`, `period`, `subject`, `teacherId?`, `teacherName?`, `room?`
+    - Supabase `student_timetables` 테이블과 1:1 매핑용
+
+### `vite-env.d.ts`
+- Vite 타입 정의 파일
+
+---
+
+## 📂 `src/core/domain/` 디렉토리 (Domain Layer)
+
+### `sessions.ts`
+- 역할: 순수 비즈니스 로직 (도메인 레이어)
+- 현재 상태: 공통 수업 계획 관련 함수들이 구현됨
+- 정의된 타입:
+  - `GenerateSessionsParams`: 수업 세션 생성 파라미터 타입 (TODO 상태)
+  - `CommonPlanAnalysis`: 공통 계획 분석 결과 타입
+    - `canUseCommonPlan`: 공통 계획 사용 가능 여부
+    - `minCount`: 최소 회차 수
+    - `classNumbers`: 포함된 반 번호 목록
+  - `LessonPlanTemplateRow`: 템플릿 한 줄 타입 (`segment`, `sessionIndex`, `content`)
+- 정의된 함수:
+  - `generateClassSessions()`: 현재 빈 구현 (TODO 주석 포함, 향후 구현 예정)
+  - `analyzeCommonPlanForSegment()`: 세그먼트별 공통 계획 분석
+    - 여러 반의 세션을 분석하여 최소 회차 계산
+    - 반이 2개 이상인 경우에만 공통 계획 사용 가능
+    - `segment` 필드를 우선 사용, 없으면 기존 플래그 기반 로직 사용
+  - `applyTemplateToSessions()`: 템플릿을 실제 세션에 적용
+    - 세그먼트별로 템플릿 내용을 세션의 `content`에 적용
+    - 최소 회차 이후 회차에 대해 `extraSessionsContent` 적용 가능
+  - `computeMinSessionsBySegment()`: 세그먼트별 최소 회차 계산 (편의 함수)
+  - `isSessionInSegment()`: 세션이 특정 세그먼트에 속하는지 판단 (내부 헬퍼)
+    - `segment` 필드 우선 사용, 없으면 `isBeforeFirstTest` 등 기존 플래그 사용
+- 목표:
+  - 학기 기간 계산 로직
+  - 학사일정 이벤트 처리
+  - 시간표 + 학사일정 → 수업 회차 생성 로직
+  - 1차/2차 지필 전·후 구간별 회차 번호 카운팅
+  - 공통 수업 계획 템플릿 분석 및 적용
+- 금지사항:
+  - React, Supabase, XLSX 등 프레임워크/라이브러리 의존 금지
+  - API 호출, DB 쿼리, 파일 I/O 금지
+- 목표: 순수 함수 중심, Node 환경에서 unit test만으로 검증 가능
+- 참고: 현재는 `src/utils/scheduleMatcher.ts`에 실제 수업 세션 생성 로직이 구현되어 있음 (향후 이곳으로 이동 예정)
+
+---
+
+## 📂 `src/infra/` 디렉토리 (Infrastructure Layer)
+
+### `src/infra/supabase/` 디렉토리
+
+#### `client.ts`
+- 역할: Supabase 클라이언트 초기화
+- 기능:
+  - 환경 변수에서 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 로드
+  - Supabase 클라이언트 인스턴스 생성 및 export
+  - 환경 변수 누락 시 에러 throw
+- Export: `supabase` 클라이언트 인스턴스
+
+#### `storage.ts`
+- 역할: Supabase 데이터 저장/로드 유틸리티
+- 책임: DB 컬럼명(`school_id`, `class_number` 등)과 도메인 타입 필드(`schoolId`, `classNumber` 등) 매핑
+- 학교 관련:
+  - `getSchools()`: Supabase에서 학교 목록 조회 (이름순 정렬)
+  - `searchSchoolsByName(keyword)`: 학교 이름 부분 일치 검색 (대소문자 무시, 최대 10개)
+  - `saveSchool()`: 학교 저장 (upsert, `onConflict: 'id'`)
+- 학사일정 관련:
+  - `getCalendars()`: 저장된 학사일정 목록 조회
+  - `saveCalendar()`: 학사일정 저장 (upsert, `onConflict: 'school_id,year,semester'`)
+  - `getCalendarById()`: 특정 학사일정 조회
+  - `getCalendarsBySchool()`: 학교별 학사일정 조회
+  - `getCalendarFor()`: 특정 학교/연도/학기의 학사일정 조회
+- 교사 시간표 관련:
+  - `saveTeacherSchedules()`: Excel 파싱 데이터를 Supabase에 저장
+    - 기존 데이터 삭제 후 새 데이터 삽입
+    - 테이블: `teacher_schedules`
+  - `getTeacherSchedules()`: 특정 학교/연도/학기의 시간표 조회
+- 수업 세션 관련:
+  - `saveClassSessions()`: 생성된 수업 일정을 Supabase에 저장
+    - 기존 데이터 삭제 후 새 데이터 삽입
+    - 테이블: `class_sessions`
+    - **`segment` 필드 저장 지원** (null 허용)
+  - `getClassSessions()`: 특정 교사/학년/반/과목의 수업 세션 조회
+    - **과목(`subject`) 파라미터 추가**
+  - `getClassSessionsByTeacherGradeSubject()`: 교사/학년/과목별 모든 반의 세션 조회
+    - **`segment` 필드 매핑 포함** (없으면 undefined)
+- 수업 계획 템플릿 관련:
+  - `getLessonPlanTemplates()`: 특정 교사/학년/과목/구간의 템플릿 조회
+  - `saveLessonPlanTemplates()`: 템플릿 저장 (upsert, `onConflict: 'school_id,year,semester,teacher_id,grade,subject,segment,session_index'`)
+    - 빈 배열 전달 시 기존 템플릿 삭제
+- **학생 시간표 관련**:
+  - `saveStudentTimetables()`: 학생 시간표 데이터를 Supabase에 저장
+    - 기존 데이터 삭제 후 새 데이터 삽입
+    - 테이블: `student_timetables`
+    - 여러 파일에서 파싱된 데이터를 일괄 저장 가능
+  - `getStudentTimetableByStudentCode()`: 학번으로 학생 시간표 조회
+    - 학번을 5자리로 보정 (예: "601" → "00601")
+    - `student_code` generated column 사용
+    - 요일/교시 순으로 정렬하여 반환
+- 특징:
+  - React 관련 코드 없음
+  - 데이터 I/O만 담당
+  - DB 컬럼명과 도메인 타입 간 변환 처리
+
+#### `sessionProcessor.ts`
+- 역할: 수업 세션 일괄 처리 및 템플릿 적용
+- 기능:
+  - `processAllClassSessions()`: 한 학교/학년도/학기의 모든 교사·학급에 대해 수업 세션 자동 생성
+    - `teacher_schedules`와 `calendars`를 조합하여 `class_sessions` 생성
+    - 교사/학년/반별로 그룹핑하여 일괄 처리
+    - 생성된 세션 총 개수 반환
+  - `applyLessonTemplateToClassSessions()`: 공통 수업 계획 템플릿을 실제 세션에 적용
+    - 특정 교사/학년/과목/구간의 모든 반 세션 조회
+    - 도메인 함수(`analyzeCommonPlanForSegment`, `applyTemplateToSessions`) 호출
+    - 반별로 그룹핑하여 저장
+- Import:
+  - `storage` from `./storage`
+  - `generateClassSessions` from `../../utils/scheduleMatcher`
+  - 도메인 함수들 from `../../core/domain/sessions`
+
+### `src/infra/excel/` 디렉토리
+
+#### `excelParser.ts`
+- 역할: Excel 파일 파싱 (나이스 시스템 시간표)
+- 기능:
+  - `parseExcelFile(file)`: Excel 파일을 읽어서 `ClassSchedule[]` 반환
+    - `FileReader` API 사용
+    - XLSX 라이브러리로 파일 읽기
+    - 첫 번째 시트 사용
+  - `parseCellContent(cellValue)`: 셀 내용 파싱
+    - 예: "3학년 미술 창작(3)" → `{ grade: 3, subject: "미술 창작", classNumber: 3 }`
+  - `parseTeacherName(teacherCell)`: 교사 이름 파싱
+    - 예: "yeayeah03(고예진)" → `{ id: "yeayeah03", name: "고예진" }`
+    - 괄호가 없는 경우: 입력값을 그대로 id와 name으로 사용
+  - 헤더 행 자동 감지 (순번, 교사성명)
+  - 요일 헤더 매핑 (월, 화, 수, 목, 금, 토, 일)
+  - 교시별 데이터 추출 (1-7교시)
+  - 헤더 행에서 요일을 찾지 못한 경우 다음 행도 확인
+  - 두 줄로 나뉜 행 병합 처리 (`mergeTwoRows` 함수)
+    - 교사 이름이 두 줄로 나뉜 경우 병합
+    - 과목명이 두 줄로 나뉜 경우 병합
+- 사용 라이브러리: `xlsx`
+- Export: `parseExcelFile`, `parseCellContent`, `parseTeacherName`
+
+#### `studentTimetableParser.ts`
+- 역할: 학생별 수업시간표 Excel 파일 파싱 (나이스 시스템)
+- 기능:
+  - `parseStudentTimetable(file, options)`: Excel 파일을 읽어서 `StudentBaseTimetableRow[]` 반환
+    - `FileReader` API 사용
+    - XLSX 라이브러리로 파일 읽기
+    - 첫 번째 시트 사용
+  - 파일 포맷 처리:
+    - 헤더: "2025학년도 2학기 3학년 6반 1번 강준영" 형식
+    - 요일 헤더: '교  시 / 월요일 / ... / 금요일'
+    - 각 교시는 2줄 구조:
+      - 첫 줄: 교시 번호 + 각 요일의 반 정보
+      - 두 번째 줄: 각 요일의 과목(교사명)
+  - 학생 정보 추출 (학년, 반, 번호, 이름)
+  - 요일별/교시별 과목 및 교사 정보 추출
+  - 교사명 파싱 (괄호 처리)
+  - 교실 정보 추출 (있는 경우)
+- 사용 라이브러리: `xlsx`
+- Export: `parseStudentTimetable`
+
+---
+
+## 📂 `src/ui/` 디렉토리 (UI Layer)
+
+- 현재 상태: 폴더 생성됨 (비어있음)
+- 목표: UI 컴포넌트를 이곳으로 이동 예정
+- 현재는 `src/components/`에 위치
+
+---
+
+## 📂 `src/components/` 디렉토리 (현재 UI 컴포넌트 위치)
+
+### `SchoolSelection.tsx` / `SchoolSelection.css`
+- 역할: 학교 선택/등록 화면
+- 기능:
+  - 학교 이름 입력 (자동완성 스타일)
+  - 부분 일치 검색으로 추천 리스트 표시 (네이버 연관검색어 스타일)
+  - 추천 리스트에서 클릭하여 바로 선택 가능
+  - 기존 학교 정확한 일치 시 확인 박스 표시
+  - 새 학교 등록
+  - Supabase에서 학교 목록 조회 및 검색
+  - **키보드 네비게이션 지원**:
+    - `ArrowDown`: 추천 리스트 아래로 이동
+    - `ArrowUp`: 추천 리스트 위로 이동
+    - `Enter`: 하이라이트된 학교 선택 또는 정확히 일치하는 학교 확인
+  - **검색 중 상태 관리** (`isSearching`): 검색 중에는 Enter 키 입력 방지
+  - **추천 리스트에 "새 학교 등록" 옵션 표시**: 정확히 일치하는 학교가 없을 때만 표시
+- Props: `onSelect: (school: School) => void`
+- Import: `storage` from `../infra/supabase/storage`
+- 주요 상태:
+  - `suggestions`: 검색 추천 리스트
+  - `foundSchool`: 정확히 일치하는 학교
+  - `hasSelected`: 선택 완료 여부
+  - `highlightedIndex`: 키보드 네비게이션 하이라이트 인덱스
+  - `isSearching`: 검색 진행 중 여부
+
+### `YearSemesterSelection.tsx` / `YearSemesterSelection.css`
+- 역할: 학년도 및 학기 선택 화면
+- 기능:
+  - 드롭다운으로 학년도 선택 (현재년도 ±5년)
+  - 1학기/2학기 선택 버튼
+  - 뒤로가기 버튼
+- Props: `onConfirm: (year, semester) => void`, `onBack: () => void`
+
+### `CalendarEditor.tsx` / `CalendarEditor.css`
+- 역할: 학사일정 달력 편집 화면
+- 기능:
+  - 월별 달력 렌더링 (학기 기간에 맞춰)
+  - 날짜 클릭으로 이벤트 추가/수정 (모달 방식)
+  - 이벤트 유형:
+    - `holiday`: 공휴일
+    - `midterm`: 1차 지필
+    - `final`: 2차 지필
+    - `mocktest`: 모의고사
+    - `recess`: 재량휴업일
+    - `substitute`: 대체공휴일
+    - `opening`: 개학식
+    - `closing`: 방학식
+    - `direct`: 직접 입력
+    - `custom`: 일반 일정
+  - 기간 설정 (시작일~종료일, 주말 자동 제외)
+  - 학년별 필터링 (1, 2, 3학년, 전체) - 달력 표시 필터
+  - 학년별 이벤트 적용 범위 설정 (`grades` 배열)
+  - 이벤트 배지 표시 (최대 5개, 색상 구분)
+  - 저장 기능 (Supabase)
+  - 마지막 저장 시간 표시
+  - 변경 사항 감지 (`isModified` 상태)
+  - 저장 확인 버튼 (디버깅용, Supabase 상태 확인)
+  - 다음 단계로 이동 버튼 (저장 완료 후에만 표시)
+    - **"다음: 교사 시간표 입력 →"** 버튼 (`onNext`)
+    - **"다음: 학생 시간표 입력 →"** 버튼 (`onNextStudentTimetable`)
+  - 2학기 선택 시 1학기 8월 데이터 자동 로드
+  - 공휴일 자동 추가 (학기 기간 내)
+- Props: `school`, `year`, `semester`, `onBack`, `onNext?`, `onNextStudentTimetable?`
+- Import:
+  - `storage` from `../infra/supabase/storage`
+  - `holidays` utilities from `../utils/holidays`
+- 주요 상태:
+  - `events`: 학사일정 이벤트 배열
+  - `savedAt`: 마지막 저장 시간
+  - `isModified`: 변경 사항 여부
+  - `gradeFilter`: 달력 표시 필터 (전체/1학년/2학년/3학년)
+
+### `TeacherScheduleUpload.tsx` / `TeacherScheduleUpload.css`
+- 역할: 교사 시간표 Excel 파일 업로드 및 수업 일정 생성
+- 기능:
+  - Excel 파일 업로드 (나이스 시스템 안내 포함)
+  - 파일 파싱 (`excelParser.ts` 호출)
+  - 파싱된 데이터를 Supabase에 저장 (`storage.saveTeacherSchedules()`)
+  - 기존 저장된 시간표 자동 로드 (컴포넌트 마운트 시)
+  - 교사 검색 기능 (이름 또는 아이디로 검색, 추천 리스트 표시)
+  - **키보드 네비게이션 (↑, ↓, Enter) 지원**:
+    - `ArrowDown`: 추천 리스트 아래로 이동
+    - `ArrowUp`: 추천 리스트 위로 이동
+    - `Enter`: 하이라이트된 교사 선택
+  - 교사 선택 후 분기:
+    - `plan` 모드: 학급별 진도 계획표 생성 (학년/과목/반 선택 → 수업 일정 생성)
+    - `timetable` 모드: 교사 시간표 표시 (요일/교시별 시간표 테이블)
+  - 교사/학년/과목/반 선택 드롭다운
+  - 수업 일정 생성 버튼 (`scheduleMatcher.ts` 호출)
+  - **DB에서 수업 일정 자동 로드** (`loadSessionsFromDB`):
+    - `viewMode`가 `'plan'`이고 교사/학년/과목/반이 모두 선택되면 자동으로 DB에서 세션 로드
+    - DB에 없으면 기존 방식대로 프론트에서 생성 (fallback)
+  - 생성된 일정을 Supabase에 저장 (`storage.saveClassSessions()`)
+  - 생성된 일정을 `ClassSessionTable`로 전달
+  - 전체 저장 버튼 (수업 일정을 Supabase에 저장)
+  - 전체 자동 생성 버튼 (`processAllClassSessions` 호출)
+  - 공통 수업 계획 템플릿 편집기 열기 (`LessonPlanTemplateEditor`)
+- Props: `school`, `year`, `semester`, `onBack`
+- Import:
+  - `parseExcelFile` from `../infra/excel/excelParser`
+  - `storage` from `../infra/supabase/storage`
+  - `generateClassSessions` from `../utils/scheduleMatcher`
+  - `processAllClassSessions` from `../infra/supabase/sessionProcessor`
+  - `ClassSessionTable` from `./ClassSessionTable`
+  - `LessonPlanTemplateEditor` from `./LessonPlanTemplateEditor`
+- 주요 상태:
+  - `teacherSearchTerm`: 교사 검색어
+  - `filteredTeacherOptions`: 검색어로 필터링된 교사 리스트
+  - `highlightedIndex`: 키보드 네비게이션 하이라이트 인덱스
+  - `viewMode`: 'plan' | 'timetable' | null
+  - `schedules`: 파싱된 시간표 데이터
+  - `sessions`: 생성된 수업 세션
+  - `isPlanEditorOpen`: 공통 수업 계획 편집기 열림 여부
+  - `selectedSubject`: 선택된 과목
+
+### `StudentTimetableUpload.tsx` / `StudentTimetableUpload.css`
+- 역할: 학생 시간표 Excel 파일 업로드 화면
+- 기능:
+  - 나이스 시스템에서 내려받은 학생별 수업시간표 Excel 파일 업로드
+  - **여러 파일 동시 업로드 지원** (`multiple` 속성)
+  - 파일 형식: `.xlsx`, `.xls`
+  - 파일 선택 및 업로드 처리
+  - 업로드 상태 표시 (idle, parsing, saving, done, error)
+  - 여러 파일 파싱 및 일괄 저장
+  - 달력 화면으로 돌아가기 버튼
+  - **학생 시간표 조회 컴포넌트 통합** (`StudentTimetableViewer`)
+- Props: `school`, `year`, `semester`, `onBack`
+- 현재 상태:
+  - UI 구조 및 스타일 완성
+  - **Excel 파서 구현 완료** (`infra/excel/studentTimetableParser.ts`)
+  - **Supabase 저장 로직 구현 완료** (`storage.saveStudentTimetables()`)
+  - **여러 파일 업로드 지원**
+- Import:
+  - CSS 파일: `./StudentTimetableUpload.css`
+  - `parseStudentTimetable` from `../infra/excel/studentTimetableParser`
+  - `storage` from `../infra/supabase/storage`
+  - `StudentTimetableViewer` from `./StudentTimetableViewer`
+- 주요 상태:
+  - `files`: 선택된 파일 배열 (여러 파일 지원)
+  - `status`: 업로드 상태 (`'idle' | 'parsing' | 'saving' | 'done' | 'error'`)
+  - `message`: 상태 메시지
+
+### `StudentTimetableViewer.tsx`
+- 역할: 학생 시간표 조회 화면 (학번으로 검색)
+- 기능:
+  - 학번 입력으로 학생 시간표 조회
+  - 학번 자동 보정 (5자리로 패딩, 예: "601" → "00601")
+  - Enter 키로 검색 가능
+  - 요일/교시별 시간표 테이블 표시
+  - 학생 정보 표시 (학교, 학년도, 학기, 학년, 반, 번호, 이름)
+  - 과목 및 교사명 표시
+  - 조회 결과 없을 때 에러 메시지 표시
+- Props: `school`, `year`, `semester`
+- Import:
+  - `storage` from `../infra/supabase/storage`
+  - `StudentBaseTimetableRow` from `../types`
+- 주요 상태:
+  - `code`: 입력된 학번
+  - `rows`: 조회된 시간표 데이터
+  - `loading`: 조회 중 여부
+  - `errorMsg`: 에러 메시지
+
+### `TeacherTimetable.tsx` / `TeacherTimetable.css`
+- 역할: 교사 시간표 테이블 표시 (요일/교시별)
+- 기능:
+  - 선택된 교사의 시간표를 요일(월~금) × 교시(1~7) 테이블로 표시
+  - 각 셀에 학년/반/과목 정보 표시 (예: "206 지Ⅰ")
+  - 여러 수업이 있는 경우 줄바꿈으로 표시
+  - 교사 이름 표시
+- Props:
+  - `schedules`: 전체 시간표 데이터
+  - `teacherId`: 표시할 교사 ID
+  - `teacherName`: 교사 이름 (옵션)
+- 특징: `TeacherScheduleUpload` 컴포넌트 내에서 사용됨
+
+### `ClassSessionTable.tsx` / `ClassSessionTable.css`
+- 역할: 생성된 수업 일정 테이블 표시
+- 기능:
+  - 회차, 날짜, 요일, 교시, 반, 학사일정, 수업 내용 표시
+  - 수업 내용 클릭 편집 (인라인 편집)
+  - Enter/Escape 키로 저장/취소
+  - 테이블 스크롤 및 반응형 레이아웃
+  - 교사 이름 및 반 정보 헤더 표시
+  - **전체 저장 버튼** (옵션, `onSaveAll` 콜백)
+- Props: `sessions`, `teacherName`, `classInfo`, `onContentChange`, `onSaveAll?` (옵션)
+
+### `LessonPlanTemplateEditor.tsx` / `LessonPlanTemplateEditor.css`
+- 역할: 공통 수업 계획 템플릿 편집 화면
+- 기능:
+  - 특정 교사/학년/과목의 공통 수업 계획 템플릿 편집
+  - **탭 기능으로 여러 시험 구간 관리**:
+    - "1차 지필 이전" 탭 (`before_first`)
+    - "2차 지필 이전" 탭 (`between_first_second`)
+    - 각 탭별로 독립적인 템플릿 편집 가능
+  - 해당 조건의 모든 반 세션 조회 및 분석
+  - 최소 회차 자동 계산 (반이 2개 이상인 경우)
+  - 템플릿 행 편집 (회차별 수업 내용)
+  - 최소 회차 이후 회차 내용 설정 (예: "자습")
+  - 템플릿 저장 (`storage.saveLessonPlanTemplates()`)
+  - 템플릿을 모든 반의 세션에 적용 (`applyLessonTemplateToClassSessions()`)
+  - 모달 방식으로 표시
+  - 활성 세그먼트 변경 시 해당 구간 기준으로 자동 재분석/로드
+- Props:
+  - `school`, `year`, `semester`, `teacherId`, `teacherName`, `grade`, `subject`, `segment`, `onClose`
+- Import:
+  - `storage` from `../infra/supabase/storage`
+  - `analyzeCommonPlanForSegment` from `../core/domain/sessions`
+  - `applyLessonTemplateToClassSessions` from `../infra/supabase/sessionProcessor`
+- 주요 상태:
+  - `activeSegment`: 현재 활성화된 시험 구간 (`ExamSegment`)
+  - `minCount`: 최소 회차 수
+  - `classNumbers`: 대상 반 번호 목록
+  - `rows`: 템플릿 행 배열 (회차별 내용)
+  - `extraContent`: 최소 회차 이후 회차 내용
+
+---
+
+## 📂 `src/utils/` 디렉토리 (유틸리티)
+
+### `holidays.ts`
+- 역할: 공휴일 계산 및 관리
+- 기능:
+  - `getHolidays(year)`: 특정 연도의 모든 공휴일 반환
+  - `getHolidayName(date)`: 날짜의 공휴일 이름 반환
+  - `isPublicHoliday(date)`: 공휴일 여부 확인
+  - `formatDate(date)`: 날짜를 YYYY-MM-DD 형식으로 변환
+  - `getSubstituteHoliday()`: 대체공휴일 계산 (주말 겹침 처리)
+  - `getLunarHolidays()`: 음력 공휴일 데이터 (설날, 추석, 부처님오신날, 2020-2030년)
+- 포함 공휴일:
+  - 양력: 신정, 삼일절, 어린이날, 현충일, 광복절, 개천절, 한글날, 크리스마스
+  - 음력: 설날, 추석, 부처님오신날
+- 특징: 대체공휴일 자동 계산 (공휴일이 주말과 겹치면 다음 평일로)
+
+### `scheduleMatcher.ts`
+- 역할: 파싱된 시간표와 학사일정을 매칭하여 수업 회차 생성
+- 기능:
+  - `generateClassSessions()`: 교사/학년/반별 수업 일정 생성
+    - 파라미터: `teacherId`, `grade`, `classNumber`, `schoolId`, `year`, `semester`, `schedules`, `calendar`
+    - 반환: `ClassSession[]`
+    - **`segment` 필드 자동 설정**:
+      - `'before_first'`: 1차 지필 이전
+      - `'between_first_second'`: 1차 지필 이후 ~ 2차 지필 이전
+      - `'after_second'`: 2차 지필 이후
+      - 수업 없는 날(공휴일/시험일 등)은 `undefined`
+  - `findTestDates()`: 1차/2차 지필평가 날짜 찾기
+  - `isNonClassDay()`: 수업 없는 날 확인 (공휴일, 시험일, 재량휴업일, 모의고사, 직접입력 등)
+  - 회차 카운팅 로직:
+    - 1차 지필 이전: 1부터 카운팅 (`sessionNumberBeforeFirst`)
+    - 1차 지필 이후 ~ 2차 지필 이전: 1부터 다시 카운팅 (`sessionNumberAfterFirst`)
+    - 2차 지필 이후 ~ 방학식 전: 1부터 다시 카운팅 (`sessionNumberAfterSecond`)
+  - 특별 이벤트 행 삽입:
+    - 개학식 날짜
+    - 1차 지필 시작 날짜 (해당 학년 기준)
+    - 2차 지필 시작 날짜 (해당 학년 기준)
+    - 방학식 날짜
+  - 주말 자동 제외
+  - 학기 기간 계산:
+    - 1학기: 2월 1일 ~ 8월 31일
+    - 2학기: 8월 1일 ~ 다음해 1월 31일
+  - 개학식/방학식 날짜 반영:
+    - 개학식이 있으면 개학식부터 시작
+    - 방학식이 있으면 방학식 전날까지만 수업
+  - 모든 교시 포함 (해당 요일에 수업이 있는 모든 교시 생성)
+  - 학년별 이벤트 필터링 (`isEventForGrade` 함수)
+- 참고: 향후 `src/core/domain/sessions.ts`로 이동 예정
+
+---
+
+## 🗄️ Supabase 데이터베이스 구조
+
+### 테이블 1: `schools`
+- 컬럼:
+  - `id` (text, primary key)
+  - `name` (text, not null)
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+- Unique 제약조건: `id`
+
+### 테이블 2: `calendars`
+- 컬럼:
+  - `id` (text, primary key)
+  - `school_id` (text, not null)
+  - `school_name` (text, not null)
+  - `year` (integer, not null)
+  - `semester` (integer, not null, check: 1 or 2)
+  - `events` (jsonb, not null) - `CalendarEvent[]` 배열
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+  - `saved_at` (timestamptz)
+- Unique 제약조건: `(school_id, year, semester)`
+- Upsert 충돌 기준: `school_id,year,semester`
+
+### 테이블 3: `teacher_schedules`
+- 컬럼:
+  - `id` (uuid, primary key, default: gen_random_uuid())
+  - `school_id` (text, not null)
+  - `year` (integer, not null)
+  - `semester` (integer, not null, check: 1 or 2)
+  - `teacher_id` (text, not null)
+  - `teacher_name` (text, not null)
+  - `subject` (text, not null)
+  - `grade` (integer, not null)
+  - `class_number` (integer, not null)
+  - `day_of_week` (integer, not null, check: 0-6)
+  - `period` (integer, not null, check: 1-7)
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+- Unique 제약조건: `(school_id, year, semester, teacher_id, grade, class_number, day_of_week, period)`
+- 인덱스: `(school_id, year, semester, teacher_id, grade, class_number)`
+
+### 테이블 4: `class_sessions`
+- 컬럼:
+  - `id` (uuid, primary key, default: gen_random_uuid())
+  - `school_id` (text, not null)
+  - `year` (integer, not null)
+  - `semester` (integer, not null, check: 1 or 2)
+  - `teacher_id` (text, not null)
+  - `teacher_name` (text, not null)
+  - `grade` (integer, not null)
+  - `class_number` (integer, not null)
+  - `subject` (text, not null)
+  - `session_number` (integer, nullable) - 회차
+  - `date` (date, not null) - YYYY-MM-DD
+  - `day_of_week` (text, not null) - "월요일", "화요일" 등
+  - `period` (integer, not null) - 교시
+  - `class_info` (text, not null) - "206 지Ⅰ" 형식
+  - `academic_event` (text, default: '') - 학사일정
+  - `content` (text, default: '') - 수업 내용
+  - `is_before_first_test` (boolean, default: false)
+  - **`segment` (text, nullable)** - 시험 구간 구분 (`'before_first' | 'between_first_second' | 'after_second'`)
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+- Unique 제약조건: `(school_id, year, semester, teacher_id, grade, class_number, date, period)`
+- 인덱스:
+  - `(school_id, year, semester, teacher_id, grade, class_number)`
+  - `(date)`
+
+### 테이블 5: `lesson_plan_templates`
+- 컬럼:
+  - `id` (uuid, primary key, default: gen_random_uuid())
+  - `school_id` (text, not null)
+  - `year` (integer, not null)
+  - `semester` (integer, not null, check: 1 or 2)
+  - `teacher_id` (text, not null)
+  - `grade` (integer, not null)
+  - `subject` (text, not null)
+  - `segment` (text, not null) - `'before_first' | 'between_first_second' | 'after_second'`
+  - `session_index` (integer, not null) - 회차 번호 (1, 2, 3, ...)
+  - `content` (text, not null) - 수업 내용
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+- Unique 제약조건: `(school_id, year, semester, teacher_id, grade, subject, segment, session_index)`
+- Upsert 충돌 기준: `school_id,year,semester,teacher_id,grade,subject,segment,session_index`
+
+### 테이블 6: `student_timetables`
+- **현재 상태: 구현 완료**
+- 컬럼:
+  - `id` (uuid, primary key, default: gen_random_uuid())
+  - `school_id` (text, not null)
+  - `year` (integer, not null)
+  - `semester` (integer, not null, check: 1 or 2)
+  - `grade` (integer, not null)
+  - `class_no` (integer, not null)
+  - `student_no` (integer, not null)
+  - `student_name` (text, not null)
+  - `day_of_week` (integer, not null, check: 1-5)
+  - `period` (integer, not null, check: 1-7)
+  - `subject` (text, not null)
+  - `teacher_id` (text, nullable)
+  - `teacher_name` (text, nullable)
+  - `room` (text, nullable) - 교실 정보
+  - `student_code` (text, generated column) - 학번 (5자리, 예: "30601")
+  - `created_at` (timestamptz)
+  - `updated_at` (timestamptz)
+- Unique 제약조건: `(school_id, year, semester, grade, class_no, student_no, day_of_week, period)`
+- 인덱스: `(school_id, year, semester, student_code)` (학번 조회 최적화)
+
+---
+
+## 🔄 데이터 흐름
+
+```
+1. SchoolSelection 
+   → Supabase에서 학교 목록 조회 (infra/supabase/storage)
+   → 학교 이름 입력 시 부분 일치 검색 (searchSchoolsByName)
+   → 추천 리스트 표시 또는 정확한 일치 확인
+   → 키보드 네비게이션 (ArrowDown/ArrowUp/Enter) 지원
+   → 학교 선택/등록
+   ↓
+
+2. YearSemesterSelection 
+   → 학년도/학기 선택
+   ↓
+
+3. CalendarEditor 
+   → Supabase에서 기존 학사일정 로드 (infra/supabase/storage)
+   → 2학기 선택 시 1학기 8월 데이터 자동 로드
+   → 공휴일 자동 추가
+   → 학사일정 편집 (모달 방식)
+   → 학년별 필터링으로 달력 표시
+   → Supabase에 저장 (upsert, 충돌 기준: school_id,year,semester)
+   → 마지막 저장 시간 표시
+   → 변경 사항 감지
+   → 다음 단계 선택:
+     - "다음: 교사 시간표 입력 →" (onNext)
+     - "다음: 학생 시간표 입력 →" (onNextStudentTimetable)
+   ↓
+
+4. TeacherScheduleUpload 
+   → Excel 파일 업로드
+   ↓
+   
+   infra/excel/excelParser.ts 
+   → Excel 파싱 (ClassSchedule[] 반환)
+   → 두 줄로 나뉜 행 병합 처리
+   ↓
+   
+   infra/supabase/storage.saveTeacherSchedules()
+   → Supabase teacher_schedules 테이블에 저장
+   (기존 데이터 삭제 후 새 데이터 삽입)
+   ↓
+   
+   또는 기존 저장된 시간표 로드
+   → storage.getTeacherSchedules()로 DB에서 조회
+   ↓
+   
+   교사 검색 및 선택 (키보드 네비게이션 지원: ↑, ↓, Enter)
+   → 분기 선택:
+     - plan: 학급별 진도 계획표
+       → 학년/과목/반 선택
+       → 자동으로 DB에서 수업 일정 로드 시도 (loadSessionsFromDB)
+       → DB에 없으면 utils/scheduleMatcher.ts로 수업 일정 생성 (fallback)
+       → 생성 시 segment 필드 자동 설정 (before_first/between_first_second/after_second)
+       → ClassSessionTable로 표시
+       → 전체 저장 버튼으로 Supabase에 저장 (segment 포함)
+       → 공통 수업 계획 템플릿 편집기 열기 (LessonPlanTemplateEditor)
+     - timetable: 교사 시간표
+       → TeacherTimetable 컴포넌트로 요일/교시별 테이블 표시
+   ↓
+   
+   또는 전체 자동 생성
+   → infra/supabase/sessionProcessor.processAllClassSessions()
+   → 모든 교사/학급에 대해 수업 세션 일괄 생성 및 저장 (segment 포함)
+   ↓
+   
+   infra/supabase/storage.saveClassSessions()
+   → Supabase class_sessions 테이블에 저장 (segment 필드 포함)
+   (기존 데이터 삭제 후 새 데이터 삽입)
+   ↓
+
+5. StudentTimetableUpload (구현 완료)
+   → 나이스 시스템에서 내려받은 학생별 수업시간표 Excel 파일 업로드
+   → 여러 파일 동시 업로드 지원 (multiple)
+   ↓
+   
+   infra/excel/studentTimetableParser.ts
+   → Excel 파싱 (StudentBaseTimetableRow[] 반환)
+   → 각 파일별로 파싱 후 결과 병합
+   ↓
+   
+   infra/supabase/storage.saveStudentTimetables()
+   → Supabase student_timetables 테이블에 저장
+   (기존 데이터 삭제 후 새 데이터 삽입)
+   ↓
+   
+   StudentTimetableViewer
+   → 학번으로 학생 시간표 조회
+   → storage.getStudentTimetableByStudentCode() 호출
+   → 요일/교시별 시간표 테이블 표시
+   ↓
+
+6. LessonPlanTemplateEditor
+   → 해당 교사/학년/과목의 모든 반 세션 조회 (segment 필드 포함)
+   → 탭으로 시험 구간 선택 (1차 지필 이전 / 2차 지필 이전)
+   → core/domain/sessions.analyzeCommonPlanForSegment()로 최소 회차 분석 (segment 기준)
+   → 템플릿 편집 (회차별 수업 내용)
+   → storage.saveLessonPlanTemplates()로 템플릿 저장 (segment별로 저장)
+   → infra/supabase/sessionProcessor.applyLessonTemplateToClassSessions()로 모든 반에 적용
+   ↓
+
+7. ClassSessionTable 
+   → 수업 일정 표시 및 편집
+   → 수업 내용 인라인 편집 (Enter/Escape 키 지원)
+   → 전체 저장 버튼 (onSaveAll 콜백)
+   (수업 내용 수정 시 onContentChange 콜백)
+```
+
+---
+
+## 🎨 스타일 파일
+
+각 컴포넌트마다 `.css` 파일이 있어 컴포넌트별 스타일을 관리합니다:
+
+- `SchoolSelection.css`
+- `YearSemesterSelection.css`
+- `CalendarEditor.css`
+- `TeacherScheduleUpload.css`
+- **`StudentTimetableUpload.css`**
+- `TeacherTimetable.css`
+- `ClassSessionTable.css`
+- `LessonPlanTemplateEditor.css`
+- `App.css` (전역 앱 스타일)
+- `index.css` (전역 리셋 및 기본 스타일)
+
+---
+
+## 📝 주요 변경사항 (최신 업데이트)
+
+### 1. 학생 시간표 업로드 기능 구현 완료
+- **`StudentTimetableUpload.tsx` / `StudentTimetableUpload.css` 컴포넌트**
+  - 나이스 시스템에서 내려받은 학생별 수업시간표 Excel 파일 업로드 UI
+  - **여러 파일 동시 업로드 지원** (`multiple` 속성)
+  - 파일 선택 및 업로드 상태 관리
+  - **Excel 파서 구현 완료** (`infra/excel/studentTimetableParser.ts`)
+  - **Supabase 저장 로직 구현 완료** (`storage.saveStudentTimetables()`)
+- **`StudentTimetableViewer.tsx` 컴포넌트 추가**
+  - 학번으로 학생 시간표 조회 기능
+  - 요일/교시별 시간표 테이블 표시
+  - Enter 키로 검색 지원
+- **`App.tsx`에 `student-timetable` 단계 추가**
+  - 달력 편집 화면에서 학생 시간표 입력 화면으로 이동 가능
+- **`CalendarEditor.tsx`에 `onNextStudentTimetable` 콜백 추가**
+  - "다음: 학생 시간표 입력 →" 버튼 추가
+  - 저장 완료 후에만 표시
+
+### 2. 학생 시간표 파서 구현
+- **`src/infra/excel/studentTimetableParser.ts` 추가**
+  - 나이스 "학생별 수업시간표" Excel 파일 파싱
+  - 파일 포맷: "2025학년도 2학기 3학년 6반 1번 강준영" 형식
+  - 요일/교시별 과목 및 교사 정보 추출
+  - 교사명 파싱 (괄호 처리)
+  - 교실 정보 추출 (있는 경우)
+
+### 3. 학생 시간표 저장 로직 구현
+- **`storage.saveStudentTimetables()` 구현**
+  - 여러 파일에서 파싱된 데이터를 일괄 저장
+  - 기존 데이터 삭제 후 새 데이터 삽입
+  - `student_timetables` 테이블에 저장
+- **`storage.getStudentTimetableByStudentCode()` 구현**
+  - 학번으로 학생 시간표 조회
+  - 학번 자동 보정 (5자리로 패딩)
+  - `student_code` generated column 사용
+
+### 4. 학생 시간표 테이블 구현
+- **`student_timetables` 테이블 생성 완료**
+  - 컬럼: `school_id`, `year`, `semester`, `grade`, `class_no`, `student_no`, `student_name`, `day_of_week`, `period`, `subject`, `teacher_id`, `teacher_name`, `room`
+  - `student_code` generated column (5자리 학번)
+  - Unique 제약조건 및 인덱스 설정
+
+### 5. 타입 추가
+- **`StudentBaseTimetableRow` 타입 추가** (`types.ts`)
+  - 학생 시간표 행 데이터 타입
+  - Supabase `student_timetables` 테이블과 1:1 매핑
+
+### 6. 3계층 아키텍처 구조 도입
+- Domain Layer: `src/core/domain/` (순수 비즈니스 로직)
+  - `sessions.ts`: 공통 수업 계획 관련 함수 구현 완료
+- Infrastructure Layer: `src/infra/` (외부 시스템 연동)
+  - `src/infra/supabase/` (Supabase 관련)
+  - `src/infra/excel/` (Excel 파싱)
+- UI Layer: `src/ui/` (현재는 비어있음, 향후 컴포넌트 이동 예정)
+
+### 7. 파일 이동 및 구조 개선
+- `src/lib/supabase.ts` → `src/infra/supabase/client.ts`
+- `src/utils/storage.ts` → `src/infra/supabase/storage.ts`
+- `src/utils/excelParser.ts` → `src/infra/excel/excelParser.ts`
+
+### 8. Import 경로 업데이트
+- 모든 컴포넌트의 import 경로가 새로운 구조에 맞게 수정됨
+- `storage` import: `../infra/supabase/storage`
+- `excelParser` import: `../infra/excel/excelParser`
+
+### 9. Domain Layer 확장
+- `src/core/domain/sessions.ts`에 공통 수업 계획 관련 함수 구현:
+  - `analyzeCommonPlanForSegment()`: 세그먼트별 공통 계획 분석
+  - `applyTemplateToSessions()`: 템플릿을 세션에 적용
+  - `computeMinSessionsBySegment()`: 최소 회차 계산
+  - `CommonPlanAnalysis` 인터페이스 추가
+  - `LessonPlanTemplateRow` 타입 추가
+
+### 10. 새로운 인프라 파일 추가
+- `src/infra/supabase/sessionProcessor.ts`:
+  - `processAllClassSessions()`: 전체 수업 세션 자동 생성
+  - `applyLessonTemplateToClassSessions()`: 템플릿을 세션에 적용
+
+### 11. Storage 기능 확장
+- `getCalendarFor()`: 특정 학교/연도/학기의 학사일정 조회 추가
+- `getClassSessionsByTeacherGradeSubject()`: 교사/학년/과목별 모든 반 세션 조회 추가
+- `getLessonPlanTemplates()`: 템플릿 조회 추가
+- `saveLessonPlanTemplates()`: 템플릿 저장 추가
+- **`saveClassSessions()`: `segment` 필드 저장 지원 추가**
+- **`getClassSessions()`: `subject` 파라미터 추가**
+- **`getClassSessionsByTeacherGradeSubject()`: `segment` 필드 매핑 추가**
+- **`saveStudentTimetables()`: 학생 시간표 저장 추가**
+- **`getStudentTimetableByStudentCode()`: 학번으로 조회 추가**
+
+### 12. 새로운 컴포넌트 추가
+- `LessonPlanTemplateEditor.tsx`: 공통 수업 계획 템플릿 편집기
+  - 최소 회차 자동 계산
+  - 템플릿 편집 및 저장
+  - 모든 반에 템플릿 적용
+  - **탭 기능으로 여러 시험 구간 관리 (1차 지필 이전 / 2차 지필 이전)**
+- **`StudentTimetableViewer.tsx`: 학생 시간표 조회 컴포넌트**
+  - 학번으로 검색
+  - 요일/교시별 시간표 표시
+
+### 13. TeacherScheduleUpload 기능 확장
+- 전체 자동 생성 버튼 추가 (`processAllClassSessions` 호출)
+- 공통 수업 계획 템플릿 편집기 통합 (`LessonPlanTemplateEditor`)
+- **과목(`selectedSubject`) 선택 기능 추가**
+- **DB에서 수업 일정 자동 로드 기능** (`loadSessionsFromDB`):
+  - `viewMode`가 `'plan'`이고 모든 선택이 완료되면 자동으로 DB에서 세션 로드
+  - DB에 없으면 기존 방식대로 프론트에서 생성 (fallback)
+- **교사 검색 키보드 네비게이션 추가** (ArrowDown/ArrowUp/Enter)
+
+### 14. 타입 추가 및 확장
+- `ExamSegment`: 시험 구간 타입 (`'before_first' | 'between_first_second' | 'after_second'`)
+- `LessonPlanTemplate`: 수업 계획 템플릿 타입
+- **`ClassSession.segment`: 시험 구간 구분 필드 추가 (옵션)**
+- **`StudentBaseTimetableRow`: 학생 시간표 행 타입 추가**
+
+### 15. 새로운 테이블 추가
+- `lesson_plan_templates`: 공통 수업 계획 템플릿 저장 테이블
+- **`student_timetables`: 학생 시간표 저장 테이블 (구현 완료)**
+
+### 16. 데이터베이스 스키마 확장
+- **`class_sessions` 테이블에 `segment` 컬럼 추가** (text, nullable)
+  - 시험 구간 구분: `'before_first'`, `'between_first_second'`, `'after_second'`
+- **`student_timetables` 테이블 생성**
+  - 학생 시간표 데이터 저장
+  - `student_code` generated column (5자리 학번)
+
+### 17. scheduleMatcher.ts 개선
+- 학년별 이벤트 필터링 기능 추가 (`isEventForGrade`)
+- 1차/2차 지필 날짜를 학년별로 구분하여 찾기 (`findFirstTestStartDate`, `findSecondTestStartDate`)
+- `isNonClassDay` 함수가 학년을 고려하여 수업 없는 날 판별
+- **세션 생성 시 `segment` 필드 자동 설정**:
+  - 1차 지필 이전: `'before_first'`
+  - 1차~2차 지필 사이: `'between_first_second'`
+  - 2차 지필 이후: `'after_second'`
+  - 수업 없는 날(공휴일/시험일 등): `undefined`
+
+### 18. LessonPlanTemplateEditor 개선
+- **탭 기능 추가**: 여러 시험 구간을 탭으로 관리
+  - "1차 지필 이전" 탭 (`before_first`)
+  - "2차 지필 이전" 탭 (`between_first_second`)
+- 활성 세그먼트 변경 시 해당 구간 기준으로 자동 재분석/로드
+- 각 구간별로 독립적인 템플릿 편집 및 저장 가능
+
+### 19. Domain Layer 세그먼트 처리 개선
+- `isSessionInSegment()` 함수가 `segment` 필드를 우선 사용
+- `segment` 필드가 없을 때만 기존 플래그 기반 로직(`isBeforeFirstTest` 등) 사용
+- 하위 호환성 유지 (기존 데이터도 처리 가능)
+
+### 20. UI 개선 사항
+- **`SchoolSelection`**:
+  - 부분 일치 검색 및 추천 리스트 기능 추가
+  - **키보드 네비게이션 추가** (ArrowDown/ArrowUp/Enter)
+  - **검색 중 상태 관리** (`isSearching`): 검색 중에는 Enter 키 입력 방지
+  - **추천 리스트에 "새 학교 등록" 옵션 표시**: 정확히 일치하는 학교가 없을 때만 표시
+- **`TeacherScheduleUpload`**: 
+  - 교사 검색 기능 추가 (이름/아이디 검색, 추천 리스트)
+  - **키보드 네비게이션 지원** (↑, ↓, Enter)
+  - viewMode 분기 기능 추가 (plan/timetable)
+  - 교사 시간표 표시 기능 통합
+  - 전체 자동 생성 기능 추가
+  - 공통 수업 계획 템플릿 편집기 통합
+  - **과목 선택 기능 추가**
+  - **DB에서 수업 일정 자동 로드 기능**
+- **`CalendarEditor`**:
+  - 학년별 필터 기능 추가 (달력 표시 필터)
+  - 마지막 저장 시간 표시
+  - 변경 사항 감지 (`isModified`)
+  - 2학기 선택 시 1학기 8월 데이터 자동 로드
+  - 모달 방식으로 이벤트 편집
+  - **"다음: 학생 시간표 입력 →" 버튼 추가**
+- **`StudentTimetableUpload`**:
+  - **여러 파일 동시 업로드 지원**
+  - **학생 시간표 조회 컴포넌트 통합** (`StudentTimetableViewer`)
+- **`ClassSessionTable`**: Enter/Escape 키 지원, **전체 저장 버튼 추가** (`onSaveAll` 콜백)
+
+### 21. Excel 파서 개선
+- 두 줄로 나뉜 행 병합 처리 (`mergeTwoRows` 함수)
+  - 교사 이름이 두 줄로 나뉜 경우 병합
+  - 과목명이 두 줄로 나뉜 경우 병합
+- **학생 시간표 파서 구현** (`studentTimetableParser.ts`)
+  - 나이스 "학생별 수업시간표" Excel 파일 파싱
+  - 학생 정보, 요일/교시별 과목 및 교사 정보 추출
+
+---
+
+## 🔧 환경 설정
+
+### 필수 환경 변수 (`.env` 파일)
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### Supabase 테이블 생성
+1. `schools` 테이블 생성
+2. `calendars` 테이블 생성 (Unique: `school_id,year,semester`)
+3. `teacher_schedules` 테이블 생성
+4. `class_sessions` 테이블 생성 (**`segment` 컬럼 포함**)
+5. `lesson_plan_templates` 테이블 생성 (Unique: `school_id,year,semester,teacher_id,grade,subject,segment,session_index`)
+6. **`student_timetables` 테이블 생성 (구현 완료)**
+   - `student_code` generated column 포함
+   - 인덱스: `(school_id, year, semester, student_code)`
+
+---
+
+## 🎯 향후 계획
+
+1. Domain Layer 확장
+   - `scheduleMatcher.ts`의 순수 로직을 `src/core/domain/sessions.ts`로 이동
+   - React/Supabase 의존성 제거
+   - 순수 함수로 리팩토링
+
+2. UI Layer 정리
+   - `src/components/`의 컴포넌트를 `src/ui/`로 이동 검토
+
+3. 테스트 추가
+   - Domain Layer의 순수 함수들에 대한 unit test 작성
+
+4. 기능 개선
+   - 수업 내용 수정 시 Supabase에 자동 저장 기능
+   - 수업 세션 조회 및 편집 기능 강화
+   - 교사 시간표 내보내기 기능
+   - 다른 시험 구간(`between_first_second`, `after_second`) 지원 확장
+   - `LessonPlanTemplateEditor`에 "2차 지필 이후" 탭 추가 검토
+   - 학생 시간표 조회 기능 확장 (반별, 학년별 조회 등)
+
+---
+
+## 📌 최신 업데이트 요약 (2024)
+
+### 주요 변경사항
+1. **학생 시간표 업로드 기능 구현 완료**
+   - `StudentTimetableUpload` 컴포넌트 (여러 파일 업로드 지원)
+   - `StudentTimetableViewer` 컴포넌트 추가 (학번으로 조회)
+   - `studentTimetableParser.ts` 파서 구현 완료
+   - `storage.saveStudentTimetables()` 저장 로직 구현 완료
+   - `storage.getStudentTimetableByStudentCode()` 조회 로직 구현 완료
+   - `student_timetables` 테이블 생성 완료
+
+2. **시험 구간(`segment`) 필드 도입**
+   - `ClassSession` 타입에 `segment` 필드 추가
+   - `class_sessions` 테이블에 `segment` 컬럼 추가
+   - `scheduleMatcher.ts`에서 세션 생성 시 `segment` 자동 설정
+
+3. **LessonPlanTemplateEditor 탭 기능**
+   - 여러 시험 구간을 탭으로 관리
+   - 각 구간별 독립적인 템플릿 편집 및 저장
+
+4. **Domain Layer 세그먼트 처리**
+   - `isSessionInSegment()` 함수가 `segment` 필드 우선 사용
+   - 기존 플래그 기반 로직과의 하위 호환성 유지
+
+5. **Storage 레이어 확장**
+   - `segment` 필드 저장/조회 지원
+   - `getClassSessions()`에 `subject` 파라미터 추가
+   - DB 컬럼과 도메인 타입 간 매핑 처리
+   - 학생 시간표 저장/조회 기능 추가
+
+6. **UI 개선: 키보드 네비게이션**
+   - `SchoolSelection`: ArrowDown/ArrowUp/Enter 키 지원
+   - `TeacherScheduleUpload`: 교사 검색 시 키보드 네비게이션 지원
+   - 검색 중 상태 관리로 사용자 경험 개선
+
+7. **TeacherScheduleUpload 자동 로드 기능**
+   - DB에서 수업 일정 자동 로드 (`loadSessionsFromDB`)
+   - `viewMode`가 `'plan'`일 때 자동으로 세션 로드
+   - DB에 없으면 기존 방식대로 생성 (fallback)
+
+8. **과목 선택 기능 추가**
+   - `TeacherScheduleUpload`에 과목 선택 드롭다운 추가
+   - 과목별로 수업 일정 관리 가능
+
+9. **ClassSessionTable 개선**
+   - 전체 저장 버튼 추가 (`onSaveAll` 콜백)
+
+10. **여러 파일 업로드 지원**
+    - `StudentTimetableUpload`에서 여러 파일 동시 업로드 가능
+    - 각 파일별로 파싱 후 결과 병합
+
+문서를 현재 코드베이스 상태에 맞게 업데이트했습니다.
+```
+
+주요 업데이트 내용:
+
+1. **학생 시간표 기능 구현 완료**: 파서, 저장 로직, 조회 기능 모두 구현 완료
+2. **`StudentTimetableViewer` 컴포넌트 추가**: 학번으로 학생 시간표 조회 기능
+3. **여러 파일 업로드 지원**: `StudentTimetableUpload`에서 여러 파일 동시 업로드 가능
+4. **`student_timetables` 테이블**: 예정에서 구현 완료로 변경
+5. **Storage 기능 확장**: 학생 시간표 저장/조회 함수 추가
+6. **데이터 흐름 업데이트**: 학생 시간표 업로드 및 조회 단계 추가
+
+문서가 현재 코드베이스 상태를 반영합니다.
