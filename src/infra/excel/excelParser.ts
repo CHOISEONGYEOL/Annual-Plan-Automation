@@ -222,11 +222,9 @@ export async function parseExcelFile(file: File): Promise<ClassSchedule[]> {
           }
 
           const orderCell = String(row[0] ?? '').trim();
-          const teacherCell = String(row[1] ?? '').trim();
 
           const nextRow = i + 1 < jsonData.length ? (jsonData[i + 1] as any[]) : null;
           const nextOrderCell = nextRow ? String(nextRow[0] ?? '').trim() : '';
-          const nextTeacherCell = nextRow ? String(nextRow[1] ?? '').trim() : '';
 
           const isOrderNumeric =
             !!orderCell && !isNaN(parseInt(orderCell, 10));
