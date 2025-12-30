@@ -233,11 +233,6 @@ export async function parseExcelFile(file: File): Promise<ClassSchedule[]> {
           const isNextOrderEmptyOrNonNumeric =
             !!nextRow && (!nextOrderCell || isNaN(parseInt(nextOrderCell, 10)));
 
-          const isTeacherNameSplit =
-            teacherCell.includes('(') &&
-            !teacherCell.includes(')') &&
-            nextTeacherCell.includes(')');
-
           // 순번이 있고, 다음 줄 순번은 없고(또는 숫자 아님) → 같은 교사 시간표일 가능성이 큼
           if (isOrderNumeric && isNextOrderEmptyOrNonNumeric && nextRow) {
             // 이름이 실제로 두 줄로 쪼개진 경우이든,
